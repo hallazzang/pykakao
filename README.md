@@ -1,7 +1,7 @@
 pykakao
 =======
 
-pykakao is a very simple kakaotalk LOCO/HTTP protocol wrapper for python
+pykakao is a very simple kakaotalk LOCO/HTTP protocol wrapper for python.
 
 Example Codes
 -------------
@@ -35,3 +35,18 @@ if kakao.login()["body"]["status"] == 0:
 else:
 	print "login failed"
 ```
+
+License
+-------
+
+pykakao is using MIT License.
+
+Thanks to
+---------
+
+Cai([0x90 :: Cai's Blog](http://www.bpak.org/blog/))
+- [[KakaoTalk+] LOCO 프로토콜 분석 (1)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-1/)
+- [[KakaoTalk+] LOCO 프로토콜 분석 (2)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-2/)
+- [[KakaoTalk+] LOCO 프로토콜 분석 (3)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-3/)
+- [[KakaoTalk+] LOCO 프로토콜 분석 (4)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-4/)
+- [[KakaoTalkPC] 카카오톡 PC 버전 분석 (1)](https://www.bpak.org/blog/2013/08/kakaotalkpc-카카오톡-pc-버전-분석-1/)
