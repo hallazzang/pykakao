@@ -19,7 +19,7 @@ else:
 	print "auth failed"
 ```
 
-2. A imple echoing bot
+2. A Simple echoing bot
 
 ```python
 from pykakao import kakaotalk
