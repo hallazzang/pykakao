@@ -3,6 +3,16 @@ pykakao
 
 pykakao is a very simple kakaotalk LOCO/HTTP protocol wrapper for python.
 
+Needs
+-----
+
+First, you need to install all the packages that pykakao imports.
+
+List of packages
+- rsa
+- bson
+- pycrypto
+
 Example Codes
 -------------
 
