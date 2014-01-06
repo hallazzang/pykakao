@@ -49,7 +49,7 @@ else:
 License
 -------
 
-pykakao is using MIT License.
+pykakao is following MIT License.
 
 Thanks to
 ---------
