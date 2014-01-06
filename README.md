@@ -1,7 +1,7 @@
 pykakao
 =======
 
-pykakao is a very simple kakaotalk LOCO/HTTP protocol wrapper for python.
+pykakao is a very simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 
 Needs
 -----
