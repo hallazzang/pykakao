@@ -49,9 +49,9 @@ else:
 License
 -------
 
-pykakao is using MIT License.
+pykakao is following MIT License.
 
-Thanks to
+Thanks To
 ---------
 
 Cai([0x90 :: Cai's Blog](http://www.bpak.org/blog/))
