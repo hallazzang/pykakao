@@ -100,6 +100,107 @@ class kakaotalk:
 		else:
 			return False
 
+	def find_user(self, uuid):
+		"""
+		find(uuid)
+		: find friend with uuid
+
+		uuid : user's uuid to find, type str
+
+		session key and device uuid required
+		"""
+
+		if not self.session_key or not self.device_uuid:
+			"error find: session key and device uuid required"
+			return None
+
+		url = "https://fr-talk.kakao.com/wp/friends/find_by_uuid.json"
+
+		data = {}
+		data["uuid"] = uuid
+
+		result = self.url_open(url, data)
+		if result["status"] == 0:
+			return result["member"]
+		else:
+			return None
+
+	def get_friend_list(self):
+		"""
+		get_friend_list()
+		: get friend list
+
+		session key and device uuid required
+		"""
+
+		if not self.session_key or not self.device_uuid:
+			print "error get_friend_list: session key and device uuid required"
+			return None
+
+		url = "https://sb-talk.kakao.com/win32/friends/update.json"
+
+		data = {}
+		data["contacts"] = []
+		data["removed_contacts"] = []
+		data["reset_contacts"] = "false"
+		data["phone_number_type"] = 1
+		data["token"] = 0
+		data["type"] = "f"
+
+		result = self.url_open(url, data)
+		if result["status"] == 0:
+			return result["friends"]
+		else:
+			return None
+
+	def add_friend(self, user_id):
+		"""
+		add_friend(user_id)
+		: add friend by user id
+
+		user_id : user's id to add
+
+		session key and device uuid required
+		"""
+
+		if not self.session_key or not self.device_uuid:
+			print "error add_friend: session key and device uuid required"
+			return None
+
+		url = "https://fr-talk.kakao.com/wp/friends/add.json"
+
+		data = {}
+		data["id"] = user_id
+
+		result = self.url_open(url, data)
+		if result["status"] == 0:
+			return result
+		else:
+			return None
+
+	def url_open(self, url, data=None):
+		"""
+		url_open(url, headers={}, data=None)
+		: open url with user's session
+
+		url : url to open
+		data : data to send, open with method GET if data is None else POST
+
+		session key and device uuid required
+		"""
+		
+		if not self.session_key or not self.device_uuid:
+			print "error url_open: session key and device uuid required"
+			return None
+
+		headers = {}
+		headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
+		headers["A"] = "win32/1.0.3/kr"
+		headers["S"] = self.session_key + "-" + self.device_uuid
+		headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+		return json.load(urlopen(Request(url, data=None if not data else urlencode(data), headers=headers)))
+
 	def checkin(self):
 		"""
 		checkin()
@@ -109,7 +210,7 @@ class kakaotalk:
 		"""
 
 		if not self.user_id:
-			print "error checkin : user_id required for this command"
+			print "error checkin: user_id required for this command"
 			return None
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -136,7 +237,7 @@ class kakaotalk:
 		"""
 
 		if not self.user_id:
-			print "error buy : user_id required for this command"
+			print "error buy: user_id required for this command"
 			return None
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -166,6 +267,7 @@ class kakaotalk:
 		"""
 
 		if not self.session_key or not self.device_uuid or not self.user_id:
+			print "error login: session key and device uuid and user id required"
 			return None
 
 		if self.s:
@@ -206,6 +308,7 @@ class kakaotalk:
 		"""
 
 		if not self.s:
+			print "error nchatlist: connection required"
 			return None
 			
 		data = {}
@@ -228,6 +331,7 @@ class kakaotalk:
 		"""
 
 		if not self.s:
+			print "error read: connection required"
 			return None
 
 		data = {}
@@ -252,6 +356,7 @@ class kakaotalk:
 		"""
 
 		if not self.s:
+			print "error write: connection required"
 			return None
 
 		data = {}
@@ -279,6 +384,7 @@ class kakaotalk:
 		"""
 
 		if not self.s:
+			print "error cwrite: connection required"
 			return None
 			
 		data = {}
@@ -302,6 +408,7 @@ class kakaotalk:
 		"""
 
 		if not self.s:
+			print "error leave: connection required"
 			return None
 			
 		data = {}
@@ -323,18 +430,28 @@ class kakaotalk:
 
 		if not s:
 			if not self.s:
+				print "error translate_response: connection required"
 				return None
 			else:
 				s = self.s
 
 		result = {}
 		head = s.recv(4)
-		if head == "\xFF\xFF\xFF\xFF":
+		if not head:
+			print "error translate_response: connection closed"
+
+			s.close()
+			s = None
+
+			return None
+		elif head == "\xFF\xFF\xFF\xFF":
+			body = s.recv(18)
+
 			result["packet_id"] = head
-			result["status_code"] = s.recv(2)
-			result["command"] = s.recv(11).replace("\x00", "")
-			result["body_type"] = s.recv(1)
-			result["body_length"] = struct.unpack("I", s.recv(4))[0]
+			result["status_code"] = body[0:2]
+			result["command"] = body[2:13].replace("\x00", "")
+			result["body_type"] = body[13:14]
+			result["body_length"] = struct.unpack("I", body[14:18])[0]
 			result["body"] = decode_all(s.recv(result["body_length"]))[0]
 
 			return result
