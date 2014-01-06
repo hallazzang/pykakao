@@ -125,10 +125,16 @@ class kakaotalk:
 		else:
 			return None
 
-	def get_friend_list(self):
+	def update_friend_list(self, contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0):
 		"""
-		get_friend_list()
-		: get friend list
+		update_friend_list(contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0)
+		: update friends list with provided contacts list
+
+		contacts : contacts list
+		removed_contacts : dunno exactly
+		reset_contacts : default to False, reset server side's contacts list
+		phone_number_type : default to 1, dunno exactly
+		token : default to 0, dunno exactly
 
 		session key and device uuid required
 		"""
@@ -140,16 +146,36 @@ class kakaotalk:
 		url = "https://sb-talk.kakao.com/win32/friends/update.json"
 
 		data = {}
-		data["contacts"] = []
-		data["removed_contacts"] = []
-		data["reset_contacts"] = "false"
-		data["phone_number_type"] = 1
-		data["token"] = 0
+		data["contacts"] = contacts
+		data["removed_contacts"] = removed_contacts
+		data["reset_contacts"] = "true" if reset_contacts else "false"
+		data["phone_number_type"] = phone_number_type
+		data["token"] = token
 		data["type"] = "f"
 
 		result = self.url_open(url, data)
 		if result["status"] == 0:
 			return result["friends"]
+		else:
+			return None
+
+	def get_blocked_list(self):
+		"""
+		get_blocked_list()
+		: get blocked members list
+
+		session key and device uuid required
+		"""
+
+		if not self.session_key or not self.device_uuid:
+			print "error get_blocked_list: session key and device uuid required"
+			return None
+
+		url = "https://sb-talk.kakao.com/win32/friends/blocked.json"
+
+		result = self.url_open(url)
+		if result["status"] == 0:
+			return result["blockedFriends"]
 		else:
 			return None
 
