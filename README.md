@@ -9,9 +9,12 @@ Needs
 First, you need to install all the packages that pykakao imports.
 
 List of packages
-- rsa
-- bson
-- pycrypto
+- [rsa](http://puu.sh/6bKjX.zip)
+- [bson](http://puu.sh/6bKmZ.zip)
+- [pycrypto.Crypto](http://puu.sh/6bKnJ.zip)
+- [pytz](http://puu.sh/6bKp4.zip)
+
+Download them and unzip, then move it to Python's site-packages directory(Ex. C:\Python27\Lib\site-packages).
 
 Example Codes
 -------------
