@@ -100,12 +100,12 @@ class kakaotalk:
 		else:
 			return False
 
-	def find_user(self, uuid):
+	def find_user(self, user_uuid):
 		"""
 		find(uuid)
 		: find friend with uuid
 
-		uuid : user's uuid to find, type str
+		user_uuid : user's uuid to find, type str
 
 		session key and device uuid required
 		"""
@@ -117,7 +117,7 @@ class kakaotalk:
 		url = "https://fr-talk.kakao.com/wp/friends/find_by_uuid.json"
 
 		data = {}
-		data["uuid"] = uuid
+		data["uuid"] = user_uuid
 
 		result = self.url_open(url, data)
 		if result["status"] == 0:
