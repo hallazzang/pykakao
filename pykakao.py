@@ -792,6 +792,7 @@ class kakaotalk:
         command : command
         args : arguments for command
         """
+        
         packet = "\xFF\xFF\xFF\xFF"
         packet += "\x00\x00"
         packet += command + "\x00" * (11 - len(command))
