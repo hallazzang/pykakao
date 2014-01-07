@@ -613,7 +613,10 @@ class kakaotalk:
             result["command"] = body[6:17].replace("\x00", "")
             result["body_type"] = body[17:18]
             result["body_length"] = struct.unpack("I", body[18:22])[0]
-            result["body"] = decode_all(body[22:])[0]
+            try:
+                result["body"] = decode_all(body[22:])[0]
+            except:
+                result["body"] = None
 
             if result["packet_id"] != "\xFF\xFF\xFF\xFF" and force_reply:
                 self.handle_packet(result)
