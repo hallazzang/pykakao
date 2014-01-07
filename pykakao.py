@@ -452,6 +452,7 @@ class kakaotalk:
         """
         login()
         : login to loco server
+        cf. result["body"] = {status, userId}
 
         session key, device uuid, user id required
         """
@@ -484,6 +485,27 @@ class kakaotalk:
         data["MCCMNC"] = None
 
         self.s.sendall(self.create_loco_handshake_packet("LOGIN", data))
+
+        return self.translate_response(force_reply=True)
+
+    def ping(self):
+        """
+        ping()
+        : ping to loco server
+        cf. result["body"] = {status}
+
+        connection required
+        """
+
+        if not self.s:
+            print "error nchatlist: connection required"
+            return None
+            
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(("loco.kakao.com", 10009))
+
+        data = {}
+        self.s.sendall(self.create_loco_secure_packet("PING", data))
 
         return self.translate_response(force_reply=True)
 
@@ -770,7 +792,6 @@ class kakaotalk:
         command : command
         args : arguments for command
         """
-
         packet = "\xFF\xFF\xFF\xFF"
         packet += "\x00\x00"
         packet += command + "\x00" * (11 - len(command))
