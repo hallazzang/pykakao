@@ -137,8 +137,8 @@ class kakaotalk:
         url = "https://sb-talk.kakao.com/win32/account/login.json"
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
-        headers["A"] = "win32/1.0.3/en"
+        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
+        headers["A"] = "win32/1.1.4/ko"
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
         data = {}
@@ -354,7 +354,7 @@ class kakaotalk:
         url = "http://up-m.talk.kakao.com/upload"
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
+        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
         headers["Content-Type"] = "multipart/form-data; boundary=%s" % (boundary)
         headers["Content-Length"] = len(body)
 
@@ -383,8 +383,8 @@ class kakaotalk:
             return None
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
-        headers["A"] = "win32/1.0.3/kr"
+        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
+        headers["A"] = "win32/1.1.4/kr"
         headers["S"] = self.session_key + "-" + self.device_uuid
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
@@ -393,7 +393,8 @@ class kakaotalk:
     def checkin(self):
         """
         checkin()
-        : checkin for getting loco server address
+        : getting loco server address (Android)
+        cf. result["body"] = {status, host, cacheExpire, csport, port, cshost}
 
         user id required
         """
@@ -403,14 +404,14 @@ class kakaotalk:
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("110.76.141.20", 5228))
+        s.connect(("loco.kakao.com", 10009))
 
         data = {}
         data["useSub"] = True
         data["ntype"] = 3
         data["userId"] = self.user_id
         data["MCCMNC"] = None
-        data["appVer"] = "3.8.7"
+        data["appVer"] = "4.2.2"
         data["os"] = "android"
 
         s.sendall(self.create_loco_packet("CHECKIN", data))
@@ -420,7 +421,8 @@ class kakaotalk:
     def buy(self):
         """
         buy()
-        : ???
+        : getting loco server address (Windows Phone)
+        cf. result["body"] = {status, pingItv, host, reqTimeout, cacheExpire, lazyWaitItv, port, deepSleepItv}
 
         user id required
         """
@@ -430,20 +432,18 @@ class kakaotalk:
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("110.76.141.20", 5228))
+        s.connect(("loco.kakao.com", 10009))
 
         data = {}
         data["ntype"] = 3
         data["countryISO"] = "KR"
         data["userId"] = self.user_id
         data["MCCMNC"] = None
-        data["appVer"] = "3.8.7"
-        data["os"] = "android"
+        data["appVer"] = "2.0.0.2"
+        data["os"] = "wp"
         data["voip"] = False
 
         s.sendall(self.create_loco_packet("BUY", data))
-        response = s.recv(65536)
-        s.close()
 
         return self.translate_response(s, force_reply=True)
 
@@ -462,7 +462,8 @@ class kakaotalk:
         if self.s:
             self.s.close()
 
-        result = self.checkin()
+        result = self.checkin() # for Android
+        # result = self.buy() # for Windows Phone
         
         host = result["body"]["host"]
         port = result["body"]["port"]
@@ -473,8 +474,8 @@ class kakaotalk:
         data = {}
         data["opt"] = ""
         data["prtVer"] = "1.0"
-        data["appVer"] = "1.5.0"
-        data["os"] = "win32"
+        data["appVer"] = "4.2.2"
+        data["os"] = "android"
         data["lang"] = "ko"
         data["sKey"] = self.session_key
         data["duuid"] = self.device_uuid
@@ -508,13 +509,13 @@ class kakaotalk:
         
         return self.translate_response(force_reply=True)
 
-    def read(self, chat_id, since=0):
+    def read(self, chat_id, since=0L):
         """
-        read(chat_id, since=0)
-        : dunno exactly, read chat room's information
+        read(chat_id, since=0L)
+        : read chat room's information and each messages from 'since' to recent one
 
         chat_id : chat room's id
-        since : ???
+        since : message's id, you can get it from nchatlist() or read() itself (keywords are logId or lastLogId)
 
         connection required
         """
