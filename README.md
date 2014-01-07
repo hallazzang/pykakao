@@ -9,7 +9,7 @@ Install it using `setup.py`.
 
     python setup.py install
 
-If you are using Windows, you will need to install PyCrypto manually. Download [zip archive](http://puu.sh/6bKnJ.zip) and unzip it in Python's `site-packages` directory(Ex. C:\Python27\Lib\site-packages).
+If you are using Windows, you need to install PyCrypto manually. Download [zip archive](http://puu.sh/6bKnJ.zip) and unzip it in Python's `site-packages` directory(Ex. C:\Python27\Lib\site-packages).
 
 Example Codes
 -------------
@@ -21,10 +21,10 @@ from pykakao import kakotalk
 
 kakao = kakaotalk()
 if kakao.auth("EMAIL", "PASSWORD", "COMPUTER NAME", "DEVICE ID"):
-	# computer name and device id are not important things. you can pass any string you want.
-	print kakao.session_key
+    # computer name and device id are not important things. you can pass any string you want.
+    print kakao.session_key
 else:
-	print "auth failed"
+    print "auth failed"
 ```
 
 2. A Simple echoing bot
@@ -34,14 +34,14 @@ from pykakao import kakaotalk
 
 kakao = kakaotalk("SESSION KEY", "DEVICE ID", USER ID)
 if kakao.login()["body"]["status"] == 0:
-	while True:
-		packet = kakao.translate_response()
+    while True:
+        packet = kakao.translate_response()
 
-		if packet["command"] == "MSG":
-			if packet["body"]["chatLog"]["authorId"] != USER ID:
-				kakao.write(packet["body"]["chatLog"]["chatId"], packet["body"]["chatLog"]["message"])
+        if packet["command"] == "MSG":
+            if packet["body"]["chatLog"]["authorId"] != USER ID:
+                kakao.write(packet["body"]["chatLog"]["chatId"], packet["body"]["chatLog"]["message"])
 else:
-	print "login failed"
+    print "login failed"
 ```
 
 License
