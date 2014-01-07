@@ -103,7 +103,7 @@ class kakaotalk:
 
         Parameters:
             session_key : Existing KakaoTalk session key. [type str]
-            device_uuid : Device's Uuid, you can pass any string but base64-encoded string recommended. [type str]
+            device_uuid : Device's uuid, you can pass any string but base64-encoded string recommended. [type str]
             user_id : Kakaotalk User Id. [type int]
         """
 
