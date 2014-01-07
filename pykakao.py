@@ -1,68 +1,137 @@
 # coding: utf-8
 
 """
-pykakao - simple kakaotalk loco/http protocol wrapper for python
+pykakao
+=======
 
-auth by h4lla(hallazzang@gmail.com)
-2014. 1. 5 ~ 2014. 1. 6
+pykakao is a very simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 
-example codes:
+Installation
+------------
+Install it using `setup.py`.
 
-1. how to get session key and user id
+    python setup.py install
 
+If you are using Windows, you need to install PyCrypto manually.
+
+To install PyCrypto manually, follow these steps.
+- Download [zip archive](http://puu.sh/6bKnJ.zip).
+- Unzip it in Python's `site-packages` directory(Ex. `C:\Python27\Lib\site-packages` or `/Library/Python/2.7`).
+
+Example Codes
+-------------
+
+1. How to get session key and user id
+
+```python
 from pykakao import kakotalk
+
 kakao = kakaotalk()
 if kakao.auth("EMAIL", "PASSWORD", "COMPUTER NAME", "DEVICE ID"):
     # computer name and device id are not important things. you can pass any string you want.
     print kakao.session_key
+    print kakao.user_id
 else:
     print "auth failed"
+```
 
-2. simple echo bot
+2. A Simple echoing bot
 
+```python
 from pykakao import kakaotalk
+
 kakao = kakaotalk("SESSION KEY", "DEVICE ID", USER ID)
 if kakao.login()["body"]["status"] == 0:
     while True:
         packet = kakao.translate_response()
 
         if packet["command"] == "MSG":
-            if packet["body"]["chatLog"]["authorId"] != USER ID:
+            if packet["body"]["chatLog"]["authorId"] != kakao.user_id:
                 kakao.write(packet["body"]["chatLog"]["chatId"], packet["body"]["chatLog"]["message"])
 else:
     print "login failed"
+```
+
+License
+-------
+
+pykakao is following MIT License.
+
+Thanks To
+---------
+
+Cai([0x90 :: Cai's Blog](http://www.bpak.org/blog/))
+- [[KakaoTalk+] LOCO 프로토콜 분석 (1)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-1/)
+- [[KakaoTalk+] LOCO 프로토콜 분석 (2)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-2/)
+- [[KakaoTalk+] LOCO 프로토콜 분석 (3)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-3/)
+- [[KakaoTalk+] LOCO 프로토콜 분석 (4)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-4/)
+- [[KakaoTalkPC] 카카오톡 PC 버전 분석 (1)](https://www.bpak.org/blog/2013/08/kakaotalkpc-카카오톡-pc-버전-분석-1/)
+
 """
 
 import os.path
 import socket
 import struct
-import rsa
 import json
 from urllib import urlencode
 from urllib2 import urlopen, Request
-from bson import BSON, decode_all, b
-from Crypto.Cipher import AES
 from binascii import hexlify, unhexlify
+try:
+    import rsa
+except ImportError, e:
+    print "ImportError: %s" % (e)
+    print "Did you try installing rsa package?"
+    print "link: https://pypi.python.org/pypi/rsa/"
+try:
+    from bson import BSON, decode_all, b
+except ImportError, e:
+    print "ImportError: %s" % (e)
+    print "Did you try installing pymongo package?"
+    print "link: https://pypi.python.org/pypi/pymongo/"
+try:
+    from Crypto.Cipher import AES
+except ImportError, e:
+    print "ImportError: %s" % (e)
+    print "Did you try installing pycrypto package?"
+    print "link: https://pypi.python.org/pypi/pycrypto/"
 
 class kakaotalk:
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
+        """
+        kakaotalk.__init__(session_key=None, device_uuid=None, user_id=None):
+            Initialize kakaotalk instance with provided informations.
+
+        Parameters:
+            session_key : Existing KakaoTalk session key. [type str]
+            device_uuid : Device's Uuid, you can pass any string but base64-encoded string recommended. [type str]
+            user_id : Kakaotalk User Id. [type int]
+        """
+
         self.session_key = session_key
         self.device_uuid = device_uuid
         self.user_id = user_id
 
         self.s = None
 
-    def auth(self, email, password, name, device_uuid, once=False, forced=False):
+    def auth(self, email, password, comp_name, device_uuid, once=False, forced=False):
         """
-        auth(email, password, name, device_uuid, once=False, forced=False)
-        : auth for getting session key and user id using way like on pc version kakaotalk.
+        kakaotalk.auth(email, password, name, device_uuid, once=False, forced=False):
+            Do some steps for authenticate to getting SESSION KEY and UESR ID following way like on PC KakaoTalk.
 
-        email : kakaotalk account's e-mail address
-        password : kakaotalk account's password
-        name : computer name, any name can passed
-        device_uuid : device uuid, any string can passed but base64-encoded-string recommended
-        once : default to False, temporarily auth or not
-        forced : default to False, ???
+        Parameters:
+            email : KakaoTalk account's email address. [type str]
+            password : KakaoTalk account's password. [type str]
+            comp_name : Computer's name, you can pass any string. [type str]
+            device_uuid : Device Uuid, you can pass any string but base64-encoded string recommended. [type str]
+            once : Temporarily authentication or not. [type bool]
+            forced : Dunno exatctly. [type bool]
+
+        Returns:
+            True if succeed, else False. [type bool]
+
+        Remarks:
+            While authenticating, you will get Pass code on your Mobile KakaoTalk.
+            Enter it when pykakao asks Pass code.
         """
 
         url = "https://sb-talk.kakao.com/win32/account/login.json"
@@ -75,7 +144,7 @@ class kakaotalk:
         data = {}
         data["email"] = email
         data["password"] = password
-        data["name"] = name
+        data["name"] = comp_name
         data["device_uuid"] = device_uuid
         data["model"] = ""
 
@@ -85,7 +154,8 @@ class kakaotalk:
 
             result = json.load(urlopen(Request(url, data=urlencode(data), headers=headers)))
             if result["status"] == 0:
-                passcode = raw_input("passcode> ")
+                print "[*] Passcode has been sent to your mobile KakaoTalk."
+                passcode = raw_input("Input Pass code > ")
 
                 data["forced"] = "true" if forced else "false"
                 data["passcode"] = passcode
@@ -103,16 +173,22 @@ class kakaotalk:
 
     def find_user(self, user_uuid):
         """
-        find(uuid)
-        : find friend with uuid
+        kakaotalk.find_user(user_uuid):
+            Find user with provided User Uuid.
 
-        user_uuid : user's uuid to find, type str
+        Parameters:
+            user_uuid : User Uuid of a member you wish to find. [type str]
 
-        session key and device uuid required
+        Returns:
+            Member's information if succeed, else None. [type dict]
+
+        Remarks:
+            Note that User Uuid is not User Id.
+            User Id is a integer, and User Uuid is a string. (Ex. "h411a" - It's me!)
         """
 
         if not self.session_key or not self.device_uuid:
-            "error find: session key and device uuid required"
+            "Error find_user: Session Key and Device Uuid required."
             return None
 
         url = "https://fr-talk.kakao.com/wp/friends/find_by_uuid.json"
@@ -128,20 +204,26 @@ class kakaotalk:
 
     def update_friend_list(self, contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0):
         """
-        update_friend_list(contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0)
-        : update friends list with provided contacts list
+        kakaotalk.update_friend_list(contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0):
+            Update friend list with provided informations.
 
-        contacts : contacts list
-        removed_contacts : dunno exactly
-        reset_contacts : default to False, reset server side's contacts list
-        phone_number_type : default to 1, dunno exactly
-        token : default to 0, dunno exactly
+        Parameters:
+            contacts : List of contacts. [type list]
+            removed_contacts : Dunno exactly. [type list]
+            reset_contacts : Reset KakaoTalk server's contacts list or not. [type bool]
+            phone_number_type : Dunno exactly, normally 1. [type int]
+            token : Dunno exactly. [type int]
 
-        session key and device uuid required
+        Returns:
+            List of friends if succeed, else None. [type list]
+
+        Remarks:
+            If you want to add friend with phone number, pass list of size 1 that includes the phone number.
+            I don't know what reset_contacts parameter exactly does, so I recommend you to don't change the default parameter.
         """
 
         if not self.session_key or not self.device_uuid:
-            print "error get_friend_list: session key and device uuid required"
+            print "Error update_friend_list: Session Key and Device Uuid required."
             return None
 
         url = "https://sb-talk.kakao.com/win32/friends/update.json"
@@ -162,14 +244,20 @@ class kakaotalk:
 
     def get_blocked_list(self):
         """
-        get_blocked_list()
-        : get blocked members list
+        kakaotalk.get_blocked_list():
+            Get blocked members' list.
 
-        session key and device uuid required
+        Parameters:
+
+        Returns:
+            List of blocked members if succeed, else None. [type list]
+
+        Remarks:
+
         """
 
         if not self.session_key or not self.device_uuid:
-            print "error get_blocked_list: session key and device uuid required"
+            print "Error get_blocked_list: Session Key and Device Uuid required."
             return None
 
         url = "https://sb-talk.kakao.com/win32/friends/blocked.json"
@@ -182,16 +270,21 @@ class kakaotalk:
 
     def add_friend(self, user_id):
         """
-        add_friend(user_id)
-        : add friend by user id
+        kakao.add_friend(user_id):
+            Add friend with provided User Id.
 
-        user_id : user's id to add
+        Parameters:
+            user_id : User Id of member you wish to add. [type int]
 
-        session key and device uuid required
+        Returns:
+            ???
+
+        Remarks:
+
         """
 
         if not self.session_key or not self.device_uuid:
-            print "error add_friend: session key and device uuid required"
+            print "Error add_friend: Session Key and Device Uuid required."
             return None
 
         url = "https://fr-talk.kakao.com/wp/friends/add.json"
@@ -207,16 +300,22 @@ class kakaotalk:
 
     def upload_image(self, path):
         """
-        upload_image(image_path)
-        : upload image to kakao server
+        kakaotalk.upload_image(path):
+            Upload image to KakaoTalk server.
 
-        path : image file's path
+        Parameters:
+            path : Image's path that you want to upload. [type str]
 
-        user id required
+        Returns:
+            The uploaded file's url if succeed, else None. [type str]
+
+        Remarks:
+            Just a path will returned as result, not completed url.
+            If you want a full url, put "http://dn-m.talk.kakao.com" in front of the result.
         """
 
         if not self.user_id:
-            print "error upload_image: user id required"
+            print "Error upload_image: User Id required."
             return None
 
         boundary = "pykakao--multipart--formdata--boundary"
@@ -225,7 +324,7 @@ class kakaotalk:
             image = open(path)
             data = image.read()
         except IOError:
-            print "error upload_pic: cannot open file"
+            print "Error upload_image: Cannot open file."
             return None
 
         body = []
@@ -265,17 +364,22 @@ class kakaotalk:
 
     def url_open(self, url, data=None):
         """
-        url_open(url, headers={}, data=None)
-        : open url with user's session
+        kakaotalk.url_open(url, data=None):
+            Open url with kakaotalk instance's information.
 
-        url : url to open
-        data : data to send, open with method GET if data is None else POST
+        Parameters:
+            url : Url to open. [type str]
+            data : Data to send, pass None if you want "GET" method. [type str]
 
-        session key and device uuid required
+        Returns:
+            Json-loaded object. [type ???]
+
+        Remarks:
+            Session Key and Device Uuid will be required to make a HTTP request.
         """
         
         if not self.session_key or not self.device_uuid:
-            print "error url_open: session key and device uuid required"
+            print "Error url_open: Session Key and Device Uuid required."
             return None
 
         headers = {}
