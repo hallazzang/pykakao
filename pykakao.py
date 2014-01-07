@@ -606,17 +606,17 @@ class kakaotalk:
             return result
         else:
             body_length = struct.unpack("I", head)[0]
-            if body_length % 16 == 0:
-                body = self.dec_aes(s.recv(body_length))
-            else:
-                return None
+            body = self.dec_aes(s.recv(body_length))
 
             result["packet_id"] = body[0:4]
             result["status_code"] = body[4:6]
             result["command"] = body[6:17].replace("\x00", "")
             result["body_type"] = body[17:18]
             result["body_length"] = struct.unpack("I", body[18:22])[0]
-            result["body"] = decode_all(body[22:])[0]
+            try:
+                result["body"] = decode_all(body[22:])[0]
+            except:
+                result["body"] = None
 
             if result["packet_id"] != "\xFF\xFF\xFF\xFF" and force_reply:
                 self.handle_packet(result)
@@ -702,8 +702,6 @@ class kakaotalk:
         IV = "locoforever\x00\x00\x00\x00\x00"
 
         aes = AES.new(key=aes_key, mode=AES.MODE_CBC, IV=IV)
-        if(len(data)%16 != 0):
-            return None
         padded_data = aes.decrypt(data)
 
         return self.pkcs7_decode(padded_data)
