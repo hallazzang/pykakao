@@ -498,7 +498,7 @@ class kakaotalk:
         """
 
         if not self.s:
-            print "error nchatlist: connection required"
+            print "error ping: connection required"
             return None
             
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
