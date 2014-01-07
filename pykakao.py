@@ -33,6 +33,7 @@ else:
     print "login failed"
 """
 
+import os.path
 import socket
 import struct
 import rsa
@@ -42,6 +43,7 @@ from urllib2 import urlopen, Request
 from bson import BSON, decode_all, b
 from Crypto.Cipher import AES
 from binascii import hexlify, unhexlify
+from PIL import Image
 
 class kakaotalk:
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
@@ -204,6 +206,64 @@ class kakaotalk:
         else:
             return None
 
+    def upload_image(self, path):
+        """
+        upload_image(image_path)
+        : upload image to kakao server
+
+        path : image file's path
+
+        user id required
+        """
+
+        if not self.user_id:
+            print "error upload_image: user id required"
+            return None
+
+        boundary = "pykakao--multipart--formdata--boundary"
+
+        try:
+            image = open(path)
+            data = image.read()
+        except IOError:
+            print "error upload_pic: cannot open file"
+            return None
+
+        body = []
+
+        body.append("--%s" % (boundary))
+        body.append("Content-Disposition: form-data; name='user_id'")
+        body.append("\r\n")
+        body.append(str(self.user_id))
+
+        body.append("--%s" % (boundary))
+        body.append("Content-Disposition: form-data; name='attachment_type'")
+        body.append("")
+        body.append("image")
+
+        body.append("--%s" % (boundary))
+        body.append("Content-Disposition: form-data; name='attachment'; filename='%s'" % (os.path.basename(path)))
+        body.append("Content-Transfer-Encoding: binary")
+        body.append("Content-Length: %d" % len(data))
+        body.append("")
+        body.append(data)
+
+        body.append("--%s--" % (boundary))
+        body.append("")
+
+        body = "\r\n".join(body)
+
+        url = "http://up-m.talk.kakao.com/upload"
+
+        headers = {}
+        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
+        headers["Content-Type"] = "multipart/form-data; boundary=%s" % (boundary)
+        headers["Content-Length"] = len(body)
+
+        response = urlopen(Request(url, data=body, headers=headers))
+
+        return response.read()
+
     def url_open(self, url, data=None):
         """
         url_open(url, headers={}, data=None)
@@ -308,15 +368,15 @@ class kakaotalk:
         self.s.connect((host, port))
 
         data = {}
-        data[u"opt"] = u""
-        data[u"prtVer"] = u"1.0"
-        data[u"appVer"] = u"1.5.0"
-        data[u"os"] = u"win32"
-        data[u"lang"] = u"ko"
-        data[u"sKey"] = self.session_key
-        data[u"duuid"] = self.device_uuid
-        data[u"ntype"] = 3
-        data[u"MCCMNC"] = None
+        data["opt"] = ""
+        data["prtVer"] = "1.0"
+        data["appVer"] = "1.5.0"
+        data["os"] = "win32"
+        data["lang"] = "ko"
+        data["sKey"] = self.session_key
+        data["duuid"] = self.device_uuid
+        data["ntype"] = 3
+        data["MCCMNC"] = None
 
         self.s.sendall(self.create_loco_handshake_packet("LOGIN", data))
 
@@ -368,7 +428,7 @@ class kakaotalk:
         
         return self.translate_response(force_reply=True)
 
-    def write(self, chat_id, msg, extra=None, type=1):
+    def write(self, chat_id, msg):
         """
         write(chat_id, msg, extra=None, type=1)
         : send message to chat room
@@ -388,11 +448,74 @@ class kakaotalk:
         data = {}
         data["chatId"] = chat_id
         data["msg"] = msg
-        data["extra"] = extra
-        data["type"] = type
+        data["type"] = 1
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
         
+        return self.translate_response(force_reply=True)
+
+    def write_image(self, chat_id, url, width=0, height=0):
+        """
+        write_image(chat_id, url)
+        : send image to chat room
+
+        chat_id : chat room's id
+        url : image url
+        width : image width
+        height : image height
+
+        connection required
+        """
+
+        if not self.s:
+            print "error write_image: connection required"
+            return None
+
+        extra = []
+        extra.append("'path':'%s'" % (url))
+        extra.append("'width':%d" % (width))
+        extra.append("'height':%d" % (height))
+        extra = "{%s}" % (",".join(extra))
+
+        data = {}
+        data["chatId"] = chat_id
+        data["extra"] = extra
+        data["type"] = 2
+
+        self.s.sendall(self.create_loco_secure_packet("WRITE", data))
+
+        return self.translate_response(force_reply=True)
+
+    def write_emoticon(self, chat_id, msg, path, name="(\uc774\ubaa8\ud2f0\ucf58)"):
+        """
+        write_emoticon(chat_id, msg, path, name)
+        : send emoticon and message to chat room
+        
+        chat_id : chat room's id
+        msg : message
+        path : emoticon path (ex. Muzi_and_Friends = 2202001.emot_001.png ~ 2202001.emot_080.png)
+        name : emoticon's name
+
+        connection required
+        """
+
+        if not self.s:
+            print "error write_emoticon: connection required"
+            return None
+
+        extra = []
+        extra.append("'path':'%s'" % (path))
+        extra.append("'name':'%s'" % (name))
+        extra = "{%s}" % (",".join(extra))
+
+        data = {}
+        data["chatId"] = chat_id
+        data["msg"] = msg
+        data["extra"] = extra
+        data["type"] = 12
+
+        self.s.sendall(self.create_loco_secure_packet("WRITE", data))
+
         return self.translate_response(force_reply=True)
 
     def cwrite(self, member_ids, msg, extra=None, pushAlert=True):
