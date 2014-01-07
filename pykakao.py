@@ -606,13 +606,28 @@ class kakaotalk:
             return result
         else:
             body_length = struct.unpack("I", head)[0]
-            body = self.dec_aes(s.recv(body_length))
+
+            body = ""
+            recv_length = 0
+            while recv_length < body_length:
+                new = s.recv(body_length - recv_length)
+                body += new
+                recv_length += len(new)
+                
+            body = self.dec_aes(body)
 
             result["packet_id"] = body[0:4]
             result["status_code"] = body[4:6]
             result["command"] = body[6:17].replace("\x00", "")
             result["body_type"] = body[17:18]
             result["body_length"] = struct.unpack("I", body[18:22])[0]
+
+            recv_length = len(body[22:])
+            while recv_length < result["body_length"]:
+                new = s.recv(result["body_length"] - recv_length)
+                body += new
+                recv_length += len(new)
+
             result["body"] = decode_all(body[22:])[0]
 
             if result["packet_id"] != "\xFF\xFF\xFF\xFF" and force_reply:
