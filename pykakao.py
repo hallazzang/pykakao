@@ -699,6 +699,7 @@ class kakaotalk:
         IV = "locoforever\x00\x00\x00\x00\x00"
 
         aes = AES.new(key=aes_key, mode=AES.MODE_CBC, IV=IV)
+	print data
         padded_data = aes.decrypt(data)
 
         return self.pkcs7_decode(padded_data)
