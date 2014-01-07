@@ -10,7 +10,7 @@ First, you need to install all the packages that pykakao imports.
 
 List of packages
 - [rsa](http://puu.sh/6bKjX.zip)
-- [bson](http://puu.sh/6bKmZ.zip)
+- [bson(download direct)](http://puu.sh/6bKmZ.zip) or, [pymongo(setup files)](https://pypi.python.org/pypi/pymongo/)
 - [pycrypto.Crypto](http://puu.sh/6bKnJ.zip)
 - [pytz](http://puu.sh/6bKp4.zip)
 
