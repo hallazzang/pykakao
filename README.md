@@ -9,7 +9,9 @@ Install it using `setup.py`.
 
     python setup.py install
 
-If you are using Windows, you need to install PyCrypto manually. Download [zip archive](http://puu.sh/6bKnJ.zip) and unzip it in Python's `site-packages` directory(Ex. C:\Python27\Lib\site-packages).
+If you are using Windows, you need to install PyCrypto manually.
+- Download [zip archive](http://puu.sh/6bKnJ.zip).
+- Unzip it in Python's `site-packages` directory(Ex. `C:\Python27\Lib\site-packages` or `/Library/Python/2.7`).
 
 Example Codes
 -------------
