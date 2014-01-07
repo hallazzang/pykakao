@@ -27,6 +27,7 @@ kakao = kakaotalk()
 if kakao.auth("EMAIL", "PASSWORD", "COMPUTER NAME", "DEVICE ID"):
     # computer name and device id are not important things. you can pass any string you want.
     print kakao.session_key
+    print kakao.user_id
 else:
     print "auth failed"
 ```
@@ -42,7 +43,7 @@ if kakao.login()["body"]["status"] == 0:
         packet = kakao.translate_response()
 
         if packet["command"] == "MSG":
-            if packet["body"]["chatLog"]["authorId"] != USER ID:
+            if packet["body"]["chatLog"]["authorId"] != kakao.user_id:
                 kakao.write(packet["body"]["chatLog"]["chatId"], packet["body"]["chatLog"]["message"])
 else:
     print "login failed"
