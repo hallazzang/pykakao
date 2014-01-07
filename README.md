@@ -3,18 +3,13 @@ pykakao
 
 pykakao is a very simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 
-Needs
------
+Installation
+------------
+Install it using `setup.py`.
 
-First, you need to install all the packages that pykakao imports.
+    python setup.py install
 
-List of packages
-- [rsa](http://puu.sh/6bKjX.zip)
-- [bson](http://puu.sh/6bKmZ.zip)
-- [pycrypto.Crypto](http://puu.sh/6bKnJ.zip)
-- [pytz](http://puu.sh/6bKp4.zip)
-
-Download them and unzip, then move it to Python's site-packages directory(Ex. C:\Python27\Lib\site-packages).
+If you are using Windows, you will need to install PyCrypto manually. Download [zip archive](http://puu.sh/6bKnJ.zip) and unzip it in Python's `site-packages` directory(Ex. C:\Python27\Lib\site-packages).
 
 Example Codes
 -------------
