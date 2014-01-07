@@ -43,7 +43,6 @@ from urllib2 import urlopen, Request
 from bson import BSON, decode_all, b
 from Crypto.Cipher import AES
 from binascii import hexlify, unhexlify
-from PIL import Image
 
 class kakaotalk:
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
@@ -572,7 +571,7 @@ class kakaotalk:
         translate_response(s=None, force_reply=False)
         : translate incoming loco packet
 
-        s : default to None, socket, None if want to using default socket
+        s : default to None, type socket, None if want to using default socket
         force_reply : default to False, return result of command-sent-by-pykakao only
                       (other packets will be sent to handle_packet)
         """
@@ -605,30 +604,40 @@ class kakaotalk:
 
             return result
         else:
-            body_length = struct.unpack("I", head)[0]
+            encrypted_body_length = struct.unpack("I", head)[0]
+            
+            encrypted_body = ""
+            recv_encrypted_body_length = 0
+            while recv_encrypted_body_length < encrypted_body_length:
+                new = s.recv(encrypted_body_length - recv_encrypted_body_length)
+                encrypted_body += new
+                recv_encrypted_body_length += len(new)
 
-            body = ""
-            recv_length = 0
-            while recv_length < body_length:
-                new = s.recv(body_length - recv_length)
-                body += new
-                recv_length += len(new)
-                
-            body = self.dec_aes(body)
+            total_body = self.dec_aes(encrypted_body)
 
-            result["packet_id"] = body[0:4]
-            result["status_code"] = body[4:6]
-            result["command"] = body[6:17].replace("\x00", "")
-            result["body_type"] = body[17:18]
-            result["body_length"] = struct.unpack("I", body[18:22])[0]
+            total_body_length = struct.unpack("I", total_body[18:22])[0]
+            recv_total_body_length = len(total_body[22:])
+            while recv_total_body_length < total_body_length:
+                encrypted_body_length = struct.unpack("I", s.recv(4))[0]
 
-            recv_length = len(body[22:])
-            while recv_length < result["body_length"]:
-                new = s.recv(result["body_length"] - recv_length)
-                body += new
-                recv_length += len(new)
+                encrypted_body = ""
+                recv_encrypted_body_length = 0
+                while recv_encrypted_body_length < encrypted_body_length:
+                    new = s.recv(encrypted_body_length - recv_encrypted_body_length)
+                    encrypted_body += new
+                    recv_encrypted_body_length += len(new)
 
-            result["body"] = decode_all(body[22:])[0]
+                body = self.dec_aes(encrypted_body)
+                total_body += body
+                recv_total_body_length += len(body)
+
+            result["packet_id"] = total_body[0:4]
+            result["status_code"] = total_body[4:6]
+            result["command"] = total_body[6:17].replace("\x00", "")
+            result["body_type"] = total_body[17:18]
+            result["body_length"] = struct.unpack("I", total_body[18:22])[0]
+
+            result["body"] = decode_all(total_body[22:])[0]
 
             if result["packet_id"] != "\xFF\xFF\xFF\xFF" and force_reply:
                 self.handle_packet(result)
