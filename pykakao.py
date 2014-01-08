@@ -99,13 +99,18 @@ except ImportError, e:
 class kakaotalk:
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
         """
-        kakaotalk.__init__(session_key=None, device_uuid=None, user_id=None):
-            Initialize kakaotalk instance with provided informations.
+        Initialize kakaotalk instance with provided informations.
 
         Parameters:
-            session_key : Existing KakaoTalk session key. [type str]
-            device_uuid : Device's uuid, you can pass any string but base64-encoded string recommended. [type str]
+            session_key : KakaoTalk session key. [type str]
+            device_uuid : Device's Uuid. [type str]
             user_id : Kakaotalk User Id. [type int]
+
+        Returns:
+
+
+        Remarks:
+            You can pass any string to 'device_uuid' but base64-encoded string recommended.
         """
 
         self.session_key = session_key
@@ -116,21 +121,21 @@ class kakaotalk:
 
     def auth(self, email, password, comp_name, device_uuid, once=False, forced=False):
         """
-        kakaotalk.auth(email, password, name, device_uuid, once=False, forced=False):
-            Do some steps for authenticate to getting SESSION KEY and UESR ID following way like on PC KakaoTalk.
+        Do some steps for authenticate to getting SESSION KEY and UESR ID following way like on PC KakaoTalk.
 
         Parameters:
             email : KakaoTalk account's email address. [type str]
             password : KakaoTalk account's password. [type str]
-            comp_name : Computer's name, you can pass any string. [type str]
-            device_uuid : Device Uuid, you can pass any string but base64-encoded string recommended. [type str]
+            comp_name : Computer's name. [type str]
+            device_uuid : Device Uuid. [type str]
             once : Temporarily authentication or not. [type bool]
             forced : Dunno exatctly. [type bool]
-
         Returns:
             True if succeed, else False. [type bool]
 
         Remarks:
+            You can pass any string to 'comp_name'.
+            You can pass any string to 'device_uuid' but base64-encoded string recommended.
             While authenticating, you will get Pass code on your Mobile KakaoTalk.
             Enter it when pykakao asks Pass code.
         """
@@ -174,8 +179,7 @@ class kakaotalk:
 
     def find_user(self, user_uuid):
         """
-        kakaotalk.find_user(user_uuid):
-            Find user with provided User Uuid.
+        Find user with provided User Uuid.
 
         Parameters:
             user_uuid : User Uuid of a member you wish to find. [type str]
@@ -205,8 +209,7 @@ class kakaotalk:
 
     def update_friend_list(self, contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0):
         """
-        kakaotalk.update_friend_list(contacts=[], removed_contacts=[], reset_contacts=False, phone_number_type=1, token=0):
-            Update friend list with provided informations.
+        Update friend list with provided informations.
 
         Parameters:
             contacts : List of contacts. [type list]
@@ -245,8 +248,7 @@ class kakaotalk:
 
     def get_blocked_list(self):
         """
-        kakaotalk.get_blocked_list():
-            Get blocked members' list.
+        Get blocked members' list.
 
         Parameters:
 
@@ -271,14 +273,13 @@ class kakaotalk:
 
     def add_friend(self, user_id):
         """
-        kakao.add_friend(user_id):
-            Add friend with provided User Id.
+        Add friend with provided User Id.
 
         Parameters:
             user_id : User Id of member you wish to add. [type int]
 
         Returns:
-            ???
+            Friend's information if succeed, else None. [type dict]
 
         Remarks:
 
@@ -295,14 +296,13 @@ class kakaotalk:
 
         result = self.url_open(url, data)
         if result["status"] == 0:
-            return result
+            return result["friend"]
         else:
             return None
 
     def upload_image(self, path):
         """
-        kakaotalk.upload_image(path):
-            Upload image to KakaoTalk server.
+        Upload image to KakaoTalk server.
 
         Parameters:
             path : Image's path that you want to upload. [type str]
@@ -365,8 +365,7 @@ class kakaotalk:
 
     def url_open(self, url, data=None):
         """
-        kakaotalk.url_open(url, data=None):
-            Open url with kakaotalk instance's information.
+        Open url with kakaotalk instance's information.
 
         Parameters:
             url : Url to open. [type str]
@@ -393,15 +392,20 @@ class kakaotalk:
 
     def checkin(self):
         """
-        checkin()
-        : getting loco server address (Android)
-        cf. result["body"] = {status, host, cacheExpire, csport, port, cshost}
+        Get Loco server's information(Android).
 
-        user id required
+        Parameters:
+
+
+        Returns:
+            Loco server's information if succeed, else None. [type dict]
+
+        Remarks:
+
         """
 
         if not self.user_id:
-            print "error checkin: user_id required for this command"
+            print "Error checkin: User Id required."
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -416,20 +420,28 @@ class kakaotalk:
         data["os"] = "android"
 
         s.sendall(self.create_loco_packet("CHECKIN", data))
-
-        return self.translate_response(s, force_reply=True)
+        result = self.translate_response(s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def buy(self):
         """
-        buy()
-        : getting loco server address (Windows Phone)
-        cf. result["body"] = {status, pingItv, host, reqTimeout, cacheExpire, lazyWaitItv, port, deepSleepItv}
+        Get Loco server's information(Windows Phone).
 
-        user id required
+        Parameters:
+
+
+        Returns:
+            Loco server's information if succeed, else None. [type dict]
+
+        Remarks:
+
         """
 
         if not self.user_id:
-            print "error buy: user_id required for this command"
+            print "Error buy: User Id required."
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -445,20 +457,28 @@ class kakaotalk:
         data["voip"] = False
 
         s.sendall(self.create_loco_packet("BUY", data))
-
-        return self.translate_response(s, force_reply=True)
+        result = self.translate_response(s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def login(self):
         """
-        login()
-        : login to loco server
-        cf. result["body"] = {status, userId}
+        Login to Loco server.
 
-        session key, device uuid, user id required
+        Parameters:
+
+
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+            pykakao is using Android-way login.
         """
 
         if not self.session_key or not self.device_uuid or not self.user_id:
-            print "error login: session key and device uuid and user id required"
+            print "Error login: Session Key and Device Uuid and User Id required."
             return None
 
         if self.s:
@@ -485,43 +505,55 @@ class kakaotalk:
         data["MCCMNC"] = None
 
         self.s.sendall(self.create_loco_handshake_packet("LOGIN", data))
-
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def ping(self):
         """
-        ping()
-        : ping to loco server
-        cf. result["body"] = {status}
+        Ping to Loco server.
 
-        connection required
+        Parameters:
+
+
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+            If you do not use this command, maybe there are no problem.
         """
 
         if not self.s:
-            print "error ping: connection required"
+            print "Error ping: Connection required"
             return None
-            
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("loco.kakao.com", 10009))
 
         data = {}
         self.s.sendall(self.create_loco_secure_packet("PING", data))
-
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def nchatlist(self, max_ids=[], chat_ids=[]):
         """
-        nchatlist(max_ids=[], chat_ids=[])
-        : get new chat rooms' list
+        Get new chat rooms' list.
 
-        max_ids : ???
-        chat_ids : ???
+        Parameters:
+            max_ids : ??? [type list]
+            chat_ids : ??? [type list]
 
-        connection required
+        Returns:
+            Result of command if succeed, else None. [type list]
+
+        Remarks:
+
         """
 
         if not self.s:
-            print "error nchatlist: connection required"
+            print "Error nchatlist: Connection required."
             return None
             
         data = {}
@@ -529,22 +561,30 @@ class kakaotalk:
         data["chatIds"] = chat_ids
 
         self.s.sendall(self.create_loco_secure_packet("NCHATLIST", data))
-        
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(force_reply=True)
+        if result["body"]["status"] == 0:
+            return result["body"]
+        else:
+            return None
 
     def read(self, chat_id, since=0L):
         """
-        read(chat_id, since=0L)
-        : read chat room's information and each messages from 'since' to recent one
+        Read chat room's information and messages from 'since' to latest.
 
-        chat_id : chat room's id
-        since : message's id, you can get it from nchatlist() or read() itself (keywords are logId or lastLogId)
+        Parameters:
+            chat_id : Chat room's id. [type int]
+            since : Message's id that you want to read from.
+                    You can get it by 'nchatlist' or 'read'(Keywords are 'logId' or 'lastLogId'). [type int]
 
-        connection required
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+
         """
 
         if not self.s:
-            print "error read: connection required"
+            print "Error read: Connection required."
             return None
 
         data = {}
@@ -552,24 +592,29 @@ class kakaotalk:
         data["since"] = since
 
         self.s.sendall(self.create_loco_secure_packet("READ", data))
-        
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def write(self, chat_id, msg):
         """
-        write(chat_id, msg, extra=None, type=1)
-        : send message to chat room
+        Send message to chat room.
 
-        chat_id : chat room's id
-        msg : message
-        extra : default to None, ???
-        type : default to 1, ???
+        Parameters:
+            chat_id : Chat room's id. [type int]
+            msg : Message that you want to send. [type str]
 
-        connection required
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+
         """
 
         if not self.s:
-            print "error write: connection required"
+            print "Error write: Connection required."
             return None
 
         data = {}
@@ -578,24 +623,31 @@ class kakaotalk:
         data["type"] = 1
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def write_image(self, chat_id, url, width=0, height=0):
         """
-        write_image(chat_id, url)
-        : send image to chat room
+        Send image to chat room.
 
-        chat_id : chat room's id
-        url : image url
-        width : image width
-        height : image height
+        Parameters:
+            chat_id : Chat room's id. [type int]
+            url : Image's url. [type str]
+            width : Image's width. [type int]
+            height : Image's height. [type int]
 
-        connection required
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+            Use 'upload_image' to upload image and get image's url.
         """
 
         if not self.s:
-            print "error write_image: connection required"
+            print "Error write_image: Connection required."
             return None
 
         extra = []
@@ -610,24 +662,35 @@ class kakaotalk:
         data["type"] = 2
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def write_emoticon(self, chat_id, msg, path, name="(\uc774\ubaa8\ud2f0\ucf58)"):
         """
-        write_emoticon(chat_id, msg, path, name)
-        : send emoticon and message to chat room
-        
-        chat_id : chat room's id
-        msg : message
-        path : emoticon path (ex. Muzi_and_Friends = 2202001.emot_001.png ~ 2202001.emot_080.png)
-        name : emoticon's name
+        Send message to chat room with emoticon.
 
-        connection required
+        Parameters:
+            chat_id : Chat room's id. [type int]
+            msg : Message that you want to send. [type str]
+            path : Emoticon's path. [type str]
+            name : Emoticon's name. [type str]
+
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+            - Emoticon's pathes
+                Muzi_and_Friends : 2202001.emot_001.png ~ 2202001.emot_080.png
+                Frodo_and_Friends : 2202002.emot_001.png ~ 2202002.emot_080.png
+                ...
+            You can pass any string to 'name', default to "(\uc774\ubaa8\ud2f0\ucf58)".
         """
 
         if not self.s:
-            print "error write_emoticon: connection required"
+            print "Error write_emoticon: Connection required."
             return None
 
         extra = []
@@ -642,25 +705,30 @@ class kakaotalk:
         data["type"] = 12
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def cwrite(self, member_ids, msg, extra=None, pushAlert=True):
         """
-        cwrite(member_ids=[], msg, extra=None, pushAlert=True)
-        : create chat room if chat room is not exists and send message to chat room
-          (multi-chat is possible)
+        Create a chat room and send message to the chat room.
 
-        member_ids : members' ids' list, type list
-        msg : message
-        extra : default to None, ???
-        pushAlert : default to True, enable push alert setting of chat room
+        Parameters:
+            member_ids : List of members' ids who you want to invite. [type list]
+            msg : Message that you want to send. [type str]
 
-        connection required
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+            If chat room is already exists, then it behaves like 'write'.
+            You can also pass two or more member ids to 'member_ids' to create group-chat room.
         """
 
         if not self.s:
-            print "error cwrite: connection required"
+            print "Error cwrite: Connection required."
             return None
             
         data = {}
@@ -670,43 +738,61 @@ class kakaotalk:
         data["pushAlert"] = pushAlert
 
         self.s.sendall(self.create_loco_secure_packet("CWRITE", data))
-        
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def leave(self, chat_id):
         """
-        leave(chat_id)
-        : leave chat room
+        Leave chat room.
 
-        chat_id : chat room's id
+        Parameters:
+            chat_id : Chat room's id. [type int]
 
-        connection is required
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+
         """
 
         if not self.s:
-            print "error leave: connection required"
+            print "Error leave: Connection required."
             return None
             
         data = {}
         data["chatId"] = chat_id
 
         self.s.sendall(self.create_loco_secure_packet("LEAVE", data))
-        
-        return self.translate_response(force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
+        if result["body"]["status"] == 0:
+            return result
+        else:
+            return None
 
     def translate_response(self, s=None, force_reply=False):
         """
-        translate_response(s=None, force_reply=False)
-        : translate incoming loco packet
+        Translate response packet from Loco server.
 
-        s : default to None, type socket, None if want to using default socket
-        force_reply : default to False, return result of command-sent-by-pykakao only
-                      (other packets will be sent to handle_packet)
+        Parameters:
+            s : Socket which is connected to Loco server. [type socket]
+            force_reply : Force to return the pykakao-reply packet. [type bool]
+
+        Returns:
+            Result of command if succeed, else None. [type dict]
+
+        Remarks:
+            Result's keys are these.:
+                (packet_id, status_code, command, body_type, body_length, body)
+            If 'force_reply' is True, non-pykakao-reply packets will be send to 'handle_packet'.
+            You can override 'handle_packet' to handle these packets.
         """
 
         if not s:
             if not self.s:
-                print "error translate_response: connection required"
+                print "Error translate_response: Connection required."
                 return None
             else:
                 s = self.s
@@ -714,8 +800,6 @@ class kakaotalk:
         result = {}
         head = s.recv(4)
         if not head:
-            print "error translate_response: connection closed"
-
             s.close()
             s = None
 
@@ -776,23 +860,21 @@ class kakaotalk:
 
     def handle_packet(self, packet):
         """
-        handle_packet(packet)
-        : handling command-not-sent-by-pykakao packets
+        Handle non-pykakao-reply packets.
 
-        packet : packet's informations, type dict
+        Parameters:
+            packet : unhandled response packets from Loco server. [type dict]
+
+        Returns:
+
+
+        Remarks:
+            You can override this function to handle non-pykakao-reply packets.
         """
 
         pass
 
-    def create_loco_packet(self, command, args):
-        """
-        create_loco_packet(command, args)
-        : create loco protocol packet
-
-        command : command
-        args : arguments for command
-        """
-        
+    def create_loco_packet(self, command, args):        
         packet = "\xFF\xFF\xFF\xFF"
         packet += "\x00\x00"
         packet += command + "\x00" * (11 - len(command))
@@ -806,27 +888,12 @@ class kakaotalk:
         return packet
 
     def create_loco_secure_packet(self, command, args):
-        """
-        create_loco_secure_packet(command, args)
-        : create loco protocol secure packet
-
-        command : command
-        args : arguments for command
-        """
-
         enc_body = self.enc_aes(self.create_loco_packet(command, args))
         packet = struct.pack("I", len(enc_body)) + enc_body
 
         return packet
 
     def create_loco_handshake_packet(self, command, args):
-        """
-        create_loco_handshake_packet(command, args)
-        : create loco protocol secure handshake packet
-
-        command : command
-        args : arguments for command
-        """
 
         aes_key = "\x00" * 16
 
