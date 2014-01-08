@@ -596,7 +596,7 @@ class kakaotalk:
         data["since"] = since
 
         self.s.sendall(self.create_loco_secure_packet("READ", data))
-        result = self.translate_response(s, force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
         if result["body"]["status"] == 0:
             return result
         else:
@@ -627,7 +627,7 @@ class kakaotalk:
         data["type"] = 1
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        result = self.translate_response(s, force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
         if result["body"]["status"] == 0:
             return result
         else:
@@ -666,7 +666,7 @@ class kakaotalk:
         data["type"] = 2
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        result = self.translate_response(s, force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
         if result["body"]["status"] == 0:
             return result
         else:
@@ -709,7 +709,7 @@ class kakaotalk:
         data["type"] = 12
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        result = self.translate_response(s, force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
         if result["body"]["status"] == 0:
             return result
         else:
@@ -742,7 +742,7 @@ class kakaotalk:
         data["pushAlert"] = pushAlert
 
         self.s.sendall(self.create_loco_secure_packet("CWRITE", data))
-        result = self.translate_response(s, force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
         if result["body"]["status"] == 0:
             return result
         else:
@@ -770,7 +770,7 @@ class kakaotalk:
         data["chatId"] = chat_id
 
         self.s.sendall(self.create_loco_secure_packet("LEAVE", data))
-        result = self.translate_response(s, force_reply=True)
+        result = self.translate_response(self.s, force_reply=True)
         if result["body"]["status"] == 0:
             return result
         else:
