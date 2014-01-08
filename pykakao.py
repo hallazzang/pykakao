@@ -1,4 +1,5 @@
-# coding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 """
 pykakao
@@ -103,7 +104,11 @@ class kakaotalk:
 
         Parameters:
             session_key : Existing KakaoTalk session key. [type str]
+<<<<<<< HEAD
             device_uuid : Device's Uuid, you can pass any string but base64-encoded string recommended. [type str]
+=======
+            device_uuid : Device's uuid, you can pass any string but base64-encoded string recommended. [type str]
+>>>>>>> ed9dcc86d9c3ac190f8df720e075583f0a9a5978
             user_id : Kakaotalk User Id. [type int]
         """
 
@@ -117,6 +122,7 @@ class kakaotalk:
         """
         kakaotalk.auth(email, password, name, device_uuid, once=False, forced=False):
             Do some steps for authenticate to getting SESSION KEY and UESR ID following way like on PC KakaoTalk.
+<<<<<<< HEAD
 
         Parameters:
             email : KakaoTalk account's email address. [type str]
@@ -126,6 +132,17 @@ class kakaotalk:
             once : Temporarily authentication or not. [type bool]
             forced : Dunno exatctly. [type bool]
 
+=======
+
+        Parameters:
+            email : KakaoTalk account's email address. [type str]
+            password : KakaoTalk account's password. [type str]
+            comp_name : Computer's name, you can pass any string. [type str]
+            device_uuid : Device Uuid, you can pass any string but base64-encoded string recommended. [type str]
+            once : Temporarily authentication or not. [type bool]
+            forced : Dunno exatctly. [type bool]
+
+>>>>>>> ed9dcc86d9c3ac190f8df720e075583f0a9a5978
         Returns:
             True if succeed, else False. [type bool]
 
@@ -137,8 +154,8 @@ class kakaotalk:
         url = "https://sb-talk.kakao.com/win32/account/login.json"
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
-        headers["A"] = "win32/1.0.3/en"
+        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
+        headers["A"] = "win32/1.1.4/ko"
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
         data = {}
@@ -275,10 +292,17 @@ class kakaotalk:
 
         Parameters:
             user_id : User Id of member you wish to add. [type int]
+<<<<<<< HEAD
 
         Returns:
             ???
 
+=======
+
+        Returns:
+            ???
+
+>>>>>>> ed9dcc86d9c3ac190f8df720e075583f0a9a5978
         Remarks:
 
         """
@@ -354,7 +378,7 @@ class kakaotalk:
         url = "http://up-m.talk.kakao.com/upload"
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
+        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
         headers["Content-Type"] = "multipart/form-data; boundary=%s" % (boundary)
         headers["Content-Length"] = len(body)
 
@@ -383,8 +407,8 @@ class kakaotalk:
             return None
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.0.3"
-        headers["A"] = "win32/1.0.3/kr"
+        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
+        headers["A"] = "win32/1.1.4/kr"
         headers["S"] = self.session_key + "-" + self.device_uuid
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
@@ -393,7 +417,8 @@ class kakaotalk:
     def checkin(self):
         """
         checkin()
-        : checkin for getting loco server address
+        : getting loco server address (Android)
+        cf. result["body"] = {status, host, cacheExpire, csport, port, cshost}
 
         user id required
         """
@@ -403,14 +428,14 @@ class kakaotalk:
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("110.76.141.20", 5228))
+        s.connect(("loco.kakao.com", 10009))
 
         data = {}
         data["useSub"] = True
         data["ntype"] = 3
         data["userId"] = self.user_id
         data["MCCMNC"] = None
-        data["appVer"] = "3.8.7"
+        data["appVer"] = "4.2.2"
         data["os"] = "android"
 
         s.sendall(self.create_loco_packet("CHECKIN", data))
@@ -420,7 +445,8 @@ class kakaotalk:
     def buy(self):
         """
         buy()
-        : ???
+        : getting loco server address (Windows Phone)
+        cf. result["body"] = {status, pingItv, host, reqTimeout, cacheExpire, lazyWaitItv, port, deepSleepItv}
 
         user id required
         """
@@ -430,20 +456,18 @@ class kakaotalk:
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("110.76.141.20", 5228))
+        s.connect(("loco.kakao.com", 10009))
 
         data = {}
         data["ntype"] = 3
         data["countryISO"] = "KR"
         data["userId"] = self.user_id
         data["MCCMNC"] = None
-        data["appVer"] = "3.8.7"
-        data["os"] = "android"
+        data["appVer"] = "2.0.0.2"
+        data["os"] = "wp"
         data["voip"] = False
 
         s.sendall(self.create_loco_packet("BUY", data))
-        response = s.recv(65536)
-        s.close()
 
         return self.translate_response(s, force_reply=True)
 
@@ -451,6 +475,7 @@ class kakaotalk:
         """
         login()
         : login to loco server
+        cf. result["body"] = {status, userId}
 
         session key, device uuid, user id required
         """
@@ -462,7 +487,8 @@ class kakaotalk:
         if self.s:
             self.s.close()
 
-        result = self.checkin()
+        result = self.checkin() # for Android
+        # result = self.buy() # for Windows Phone
         
         host = result["body"]["host"]
         port = result["body"]["port"]
@@ -473,8 +499,8 @@ class kakaotalk:
         data = {}
         data["opt"] = ""
         data["prtVer"] = "1.0"
-        data["appVer"] = "1.5.0"
-        data["os"] = "win32"
+        data["appVer"] = "4.2.2"
+        data["os"] = "android"
         data["lang"] = "ko"
         data["sKey"] = self.session_key
         data["duuid"] = self.device_uuid
@@ -482,6 +508,27 @@ class kakaotalk:
         data["MCCMNC"] = None
 
         self.s.sendall(self.create_loco_handshake_packet("LOGIN", data))
+
+        return self.translate_response(force_reply=True)
+
+    def ping(self):
+        """
+        ping()
+        : ping to loco server
+        cf. result["body"] = {status}
+
+        connection required
+        """
+
+        if not self.s:
+            print "error ping: connection required"
+            return None
+            
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(("loco.kakao.com", 10009))
+
+        data = {}
+        self.s.sendall(self.create_loco_secure_packet("PING", data))
 
         return self.translate_response(force_reply=True)
 
@@ -508,13 +555,13 @@ class kakaotalk:
         
         return self.translate_response(force_reply=True)
 
-    def read(self, chat_id, since=0):
+    def read(self, chat_id, since=0L):
         """
-        read(chat_id, since=0)
-        : dunno exactly, read chat room's information
+        read(chat_id, since=0L)
+        : read chat room's information and each messages from 'since' to recent one
 
         chat_id : chat room's id
-        since : ???
+        since : message's id, you can get it from nchatlist() or read() itself (keywords are logId or lastLogId)
 
         connection required
         """
@@ -768,7 +815,7 @@ class kakaotalk:
         command : command
         args : arguments for command
         """
-
+        
         packet = "\xFF\xFF\xFF\xFF"
         packet += "\x00\x00"
         packet += command + "\x00" * (11 - len(command))
