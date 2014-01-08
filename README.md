@@ -21,7 +21,7 @@ Example Codes
 1. How to get session key and user id
 
 ```python
-from pykakao import kakotalk
+from pykakao import kakaotalk
 
 kakao = kakaotalk()
 if kakao.auth("EMAIL", "PASSWORD", "COMPUTER NAME", "DEVICE ID"):
