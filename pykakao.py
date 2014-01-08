@@ -82,19 +82,23 @@ try:
 except ImportError, e:
     print "ImportError: %s" % (e)
     print "Did you try installing rsa package?"
-    print "link: https://pypi.python.org/pypi/rsa/"
+    print "follow link: https://pypi.python.org/pypi/rsa/"
+    exit()
 try:
     from bson import BSON, decode_all, b
 except ImportError, e:
     print "ImportError: %s" % (e)
     print "Did you try installing pymongo package?"
-    print "link: https://pypi.python.org/pypi/pymongo/"
+    print "follow link: https://pypi.python.org/pypi/pymongo/"
+    exit()
 try:
     from Crypto.Cipher import AES
 except ImportError, e:
     print "ImportError: %s" % (e)
     print "Did you try installing pycrypto package?"
-    print "link: https://pypi.python.org/pypi/pycrypto/"
+    print "If you use Windows, follow link: http://www.voidspace.org.uk/python/modules.shtml#pycrypto"
+    print "Else, 'pip install pycrypto'"
+    exit()
 
 class kakaotalk:
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
