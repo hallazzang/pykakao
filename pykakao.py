@@ -413,7 +413,7 @@ class kakaotalk:
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("loco.kakao.com", 10009))
+        s.connect(("110.76.141.20", 5228))
 
         data = {}
         data["useSub"] = True
@@ -425,7 +425,7 @@ class kakaotalk:
 
         s.sendall(self.create_loco_packet("CHECKIN", data))
         result = self.translate_response(s, force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -449,7 +449,7 @@ class kakaotalk:
             return None
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(("loco.kakao.com", 10009))
+        s.connect(("110.76.141.20", 5228))
 
         data = {}
         data["ntype"] = 3
@@ -462,7 +462,7 @@ class kakaotalk:
 
         s.sendall(self.create_loco_packet("BUY", data))
         result = self.translate_response(s, force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -510,7 +510,7 @@ class kakaotalk:
 
         self.s.sendall(self.create_loco_handshake_packet("LOGIN", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -536,7 +536,7 @@ class kakaotalk:
         data = {}
         self.s.sendall(self.create_loco_secure_packet("PING", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -597,7 +597,7 @@ class kakaotalk:
 
         self.s.sendall(self.create_loco_secure_packet("READ", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -624,11 +624,12 @@ class kakaotalk:
         data = {}
         data["chatId"] = chat_id
         data["msg"] = msg
-        data["type"] = 1
+        data["type"] = 8
+        data["attachment"] = "{'path':'/talkc/K6eN1NZdBg/UgxrBjCetkXLgRKSeOKut1/gsgxc2'}"
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -667,7 +668,7 @@ class kakaotalk:
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -710,7 +711,7 @@ class kakaotalk:
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -743,7 +744,7 @@ class kakaotalk:
 
         self.s.sendall(self.create_loco_secure_packet("CWRITE", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -771,7 +772,7 @@ class kakaotalk:
 
         self.s.sendall(self.create_loco_secure_packet("LEAVE", data))
         result = self.translate_response(force_reply=True)
-        if result["body"]["status"] == 0:
+        if result and result["body"]["status"] == 0:
             return result
         else:
             return None
@@ -804,6 +805,7 @@ class kakaotalk:
         result = {}
         head = s.recv(4)
         if not head:
+            print "Error translate_response: Connection closed."
             s.close()
             s = None
 
@@ -828,7 +830,6 @@ class kakaotalk:
                 new = s.recv(encrypted_body_length - recv_encrypted_body_length)
                 encrypted_body += new
                 recv_encrypted_body_length += len(new)
-
             total_body = self.dec_aes(encrypted_body)
 
             total_body_length = struct.unpack("I", total_body[18:22])[0]
@@ -876,6 +877,8 @@ class kakaotalk:
             You can override this function to handle non-pykakao-reply packets.
         """
 
+        print "AHOTHER: %s %s" % (packet["command"], packet["body"])
+
         pass
 
     def create_loco_packet(self, command, args):        
@@ -892,8 +895,21 @@ class kakaotalk:
         return packet
 
     def create_loco_secure_packet(self, command, args):
-        enc_body = self.enc_aes(self.create_loco_packet(command, args))
-        packet = struct.pack("I", len(enc_body)) + enc_body
+        body = self.create_loco_packet(command, args)
+        packet = ""
+        body_length = len(body)
+        encrypt_length = (body_length / 16 + 1) * 16
+        while encrypt_length > 2048:
+            encrypt_body = body[:2047]
+            encrypted_body = self.enc_aes(encrypt_body)
+            encrypted_body_length = len(encrypted_body)
+            packet += struct.pack("I", encrypted_body_length) + encrypted_body
+            body = body[2047:]
+            body_length = len(body)
+            encrypt_length = (body_length / 16 + 1) * 16
+        encrypted_body = self.enc_aes(body)
+        encrypted_body_length = len(encrypted_body)
+        packet += struct.pack("I", encrypted_body_length) + encrypted_body
 
         return packet
 
