@@ -806,7 +806,6 @@ class kakaotalk:
         if not head:
             print "Error translate_response: Connection closed."
             s.close()
-            s = None
 
             return None
         elif head == "\xFF\xFF\xFF\xFF":
