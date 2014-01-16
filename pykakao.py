@@ -624,8 +624,7 @@ class kakaotalk:
         data = {}
         data["chatId"] = chat_id
         data["msg"] = msg
-        data["type"] = 8
-        data["attachment"] = "{'path':'/talkc/K6eN1NZdBg/UgxrBjCetkXLgRKSeOKut1/gsgxc2'}"
+        data["type"] = 1
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
         result = self.translate_response(force_reply=True)
