@@ -3,6 +3,8 @@ pykakao
 
 pykakao is a very simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 
+Wait! If you gonna use 'Your' Kakaotalk ID(not an extra ID), using this library to run a bot or else is not recommended. (because of critical problem with PC Kakaotalk's login, and I don't know why it happens exactly.)
+
 Installation
 ------------
 Install it using `setup.py`.
