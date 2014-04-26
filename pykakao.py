@@ -326,7 +326,7 @@ class kakaotalk:
         boundary = "pykakao--multipart--formdata--boundary"
 
         try:
-            image = open(path)
+            image = open(path, 'rb')
             data = image.read()
         except IOError:
             print "Error upload_image: Cannot open file."
