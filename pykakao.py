@@ -74,6 +74,8 @@ import os.path
 import socket
 import struct
 import json
+import base64
+import binascii
 from urllib import urlencode
 from urllib2 import urlopen, Request
 from binascii import hexlify, unhexlify
@@ -154,6 +156,11 @@ class kakaotalk:
             While authenticating, you will get Pass code on your Mobile KakaoTalk.
             Enter it when pykakao asks Pass code.
         """
+
+        try:
+            base64.decodestring(device_uuid)
+        except binascii.Error:
+            device_uuid = base64.b64encode(device_uuid)
 
         url = kakaotalk.KAKAO_AUTH_URL
 
