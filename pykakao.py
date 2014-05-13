@@ -542,7 +542,7 @@ class kakaotalk:
         else:
             return None
 
-    def ping(self):
+    def ping(self, resp=False):
         """
         Ping to Loco server.
 
@@ -561,12 +561,14 @@ class kakaotalk:
             return None
 
         data = {}
-        self.s.sendall(self.create_loco_secure_packet("PING", data))
-        result = self.translate_response(force_reply=True)
-        if result and result["body"]["status"] == 0:
-            return result
-        else:
-            return None
+
+        if resp:
+            self.s.sendall(self.create_loco_secure_packet("PING", data))
+            result = self.translate_response(force_reply=True)
+            if result and result["body"]["status"] == 0:
+                return result
+            else:
+                return None
 
     def nchatlist(self, max_ids=[], chat_ids=[]):
         """
