@@ -507,11 +507,6 @@ class kakaotalk:
             print "Error login: Session Key and Device Uuid and User Id required."
             return None
 
-        if 'nodelay' in options:
-            self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        if 'timeout' in options:
-            self.s.settimeout(options['timeout'])
-
         if self.s:
             self.s.close()
 
@@ -523,6 +518,11 @@ class kakaotalk:
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((host, port))
+
+        if 'nodelay' in options:
+            self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        if 'timeout' in options:
+            self.s.settimeout(options['timeout'])
 
         data = {}
         data["opt"] = ""
