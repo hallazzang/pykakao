@@ -101,6 +101,17 @@ except ImportError, e:
     exit()
 
 class kakaotalk:
+    KAKAO_AUTH_URL = "https://sb-talk.kakao.com/win32/account/login.json"
+    KAKAO_FIND_URL = "https://fr-talk.kakao.com/wp/friends/find_by_uuid.json"
+    KAKAO_UPDATE_URL = "https://sb-talk.kakao.com/win32/friends/update.json"
+    KAKAO_BLOCKED_URL = "https://sb-talk.kakao.com/win32/friends/blocked.json"
+    KAKAO_ADD_FRIEND_URL = "https://fr-talk.kakao.com/wp/friends/add.json"
+    KAKAO_UPLOAD_URL = "http://up-m.talk.kakao.com/upload"
+
+    KAKAO_USER_AGENT = "KakaoTalk Win32 1.1.8"
+    KAKAO_AUTH_AGENT = "win32/1.1.8/ko"
+    KAKAO_AGENT = "win32/1.1.8/kr"
+
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
         """
         Initialize kakaotalk instance with provided informations.
@@ -144,11 +155,11 @@ class kakaotalk:
             Enter it when pykakao asks Pass code.
         """
 
-        url = "https://sb-talk.kakao.com/win32/account/login.json"
+        url = kakaotalk.KAKAO_AUTH_URL
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
-        headers["A"] = "win32/1.1.4/ko"
+        headers["User-Agent"] = kakaotalk.KAKAO_USER_AGENT
+        headers["A"] = kakaotalk.KAKAO_AUTH_AGENT
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
         data = {}
@@ -200,7 +211,7 @@ class kakaotalk:
             "Error find_user: Session Key and Device Uuid required."
             return None
 
-        url = "https://fr-talk.kakao.com/wp/friends/find_by_uuid.json"
+        url = kakaotalk.KAKAO_FIND_URL
 
         data = {}
         data["uuid"] = user_uuid
@@ -234,7 +245,7 @@ class kakaotalk:
             print "Error update_friend_list: Session Key and Device Uuid required."
             return None
 
-        url = "https://sb-talk.kakao.com/win32/friends/update.json"
+        url = kakaotalk.KAKAO_UPDATE_URL
 
         data = {}
         data["contacts"] = contacts
@@ -267,7 +278,7 @@ class kakaotalk:
             print "Error get_blocked_list: Session Key and Device Uuid required."
             return None
 
-        url = "https://sb-talk.kakao.com/win32/friends/blocked.json"
+        url = kakaotalk.KAKAO_BLOCKED_URL
 
         result = self.url_open(url)
         if result["status"] == 0:
@@ -293,7 +304,7 @@ class kakaotalk:
             print "Error add_friend: Session Key and Device Uuid required."
             return None
 
-        url = "https://fr-talk.kakao.com/wp/friends/add.json"
+        url = kakaotalk.KAKAO_ADD_FRIEND_URL
 
         data = {}
         data["id"] = user_id
@@ -356,10 +367,10 @@ class kakaotalk:
 
         body = "\r\n".join(body)
 
-        url = "http://up-m.talk.kakao.com/upload"
+        url = kakaotalk.KAKAO_UPLOAD_URL
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
+        headers["User-Agent"] = kakaotalk.KAKAO_USER_AGENT
         headers["Content-Type"] = "multipart/form-data; boundary=%s" % (boundary)
         headers["Content-Length"] = len(body)
 
@@ -387,8 +398,8 @@ class kakaotalk:
             return None
 
         headers = {}
-        headers["User-Agent"] = "KakaoTalk Win32 1.1.4"
-        headers["A"] = "win32/1.1.4/kr"
+        headers["User-Agent"] = kakaotalk.KAKAO_USER_AGENT
+        headers["A"] = kakaotalk.KAKAO_AGENT
         headers["S"] = self.session_key + "-" + self.device_uuid
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
