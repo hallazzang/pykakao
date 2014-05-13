@@ -115,7 +115,7 @@ class kakaotalk:
     KAKAO_AGENT = "win32/1.1.8/kr"
     ANDROID_VERSION = "4.3.0"
 
-    def __init__(self, session_key=None, device_uuid=None, user_id=None):
+    def __init__(self, session_key=None, device_uuid=None, user_id=None, **options):
         """
         Initialize kakaotalk instance with provided informations.
 
@@ -135,6 +135,7 @@ class kakaotalk:
         self.device_uuid = device_uuid
         self.user_id = user_id
 
+        self.debug = True if 'debug' in options else False
         self.s = None
 
     def auth(self, email, password, comp_name, device_uuid, once=False, forced=False):
@@ -198,6 +199,8 @@ class kakaotalk:
 
             return True
         else:
+            if self.debug:
+                print result
             return False
 
     def find_user(self, user_uuid):
@@ -486,7 +489,7 @@ class kakaotalk:
         else:
             return None
 
-    def login(self):
+    def login(self, **options):
         """
         Login to Loco server.
 
@@ -504,6 +507,11 @@ class kakaotalk:
             print "Error login: Session Key and Device Uuid and User Id required."
             return None
 
+        if 'nodelay' in options:
+            self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        if 'timeout' in options:
+            self.s.settimeout(options['timeout'])
+
         if self.s:
             self.s.close()
 
@@ -519,7 +527,7 @@ class kakaotalk:
         data = {}
         data["opt"] = ""
         data["prtVer"] = "1.0"
-        data["appVer"] = "4.2.2"
+        data["appVer"] = kakaotalk.ANDROID_VERSION
         data["os"] = "android"
         data["lang"] = "ko"
         data["sKey"] = self.session_key
