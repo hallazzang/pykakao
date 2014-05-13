@@ -383,7 +383,7 @@ class kakaotalk:
         headers = {}
         headers["User-Agent"] = kakaotalk.KAKAO_USER_AGENT
         headers["Content-Type"] = "multipart/form-data; boundary=%s" % (boundary)
-        headers["Content-Length"] = len(body)
+        headers["Content-Length"] = str(len(body))
 
         response = urlopen(Request(url, data=body, headers=headers))
 
