@@ -113,6 +113,7 @@ class kakaotalk:
     KAKAO_USER_AGENT = "KakaoTalk Win32 1.1.8"
     KAKAO_AUTH_AGENT = "win32/1.1.8/ko"
     KAKAO_AGENT = "win32/1.1.8/kr"
+    ANDROID_VERSION = "4.3.0"
 
     def __init__(self, session_key=None, device_uuid=None, user_id=None):
         """
@@ -438,7 +439,7 @@ class kakaotalk:
         data["ntype"] = 3
         data["userId"] = self.user_id
         data["MCCMNC"] = None
-        data["appVer"] = "4.2.2"
+        data["appVer"] = kakaotalk.ANDROID_VERSION
         data["os"] = "android"
 
         s.sendall(self.create_loco_packet("CHECKIN", data))
