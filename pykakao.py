@@ -629,7 +629,7 @@ class kakaotalk:
         else:
             return None
 
-    def write(self, chat_id, msg):
+    def write(self, chat_id, msg, resp=False):
         """
         Send message to chat room.
 
@@ -654,13 +654,15 @@ class kakaotalk:
         data["type"] = 1
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        result = self.translate_response(force_reply=True)
-        if result and result["body"]["status"] == 0:
-            return result
-        else:
-            return None
 
-    def write_image(self, chat_id, url, width=0, height=0):
+        if resp:
+            result = self.translate_response(force_reply=True)
+            if result and result["body"]["status"] == 0:
+                return result
+            else:
+                return None
+
+    def write_image(self, chat_id, url, width=0, height=0, resp=True):
         """
         Send image to chat room.
 
@@ -693,13 +695,15 @@ class kakaotalk:
         data["type"] = 2
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        result = self.translate_response(force_reply=True)
-        if result and result["body"]["status"] == 0:
-            return result
-        else:
-            return None
 
-    def write_emoticon(self, chat_id, msg, path, name="(\uc774\ubaa8\ud2f0\ucf58)"):
+        if resp:
+            result = self.translate_response(force_reply=True)
+            if result and result["body"]["status"] == 0:
+                return result
+            else:
+                return None
+
+    def write_emoticon(self, chat_id, msg, path, name="(\uc774\ubaa8\ud2f0\ucf58)", resp=True):
         """
         Send message to chat room with emoticon.
 
@@ -736,13 +740,15 @@ class kakaotalk:
         data["type"] = 12
 
         self.s.sendall(self.create_loco_secure_packet("WRITE", data))
-        result = self.translate_response(force_reply=True)
-        if result and result["body"]["status"] == 0:
-            return result
-        else:
-            return None
 
-    def cwrite(self, member_ids, msg, extra=None, pushAlert=True):
+        if resp:
+            result = self.translate_response(force_reply=True)
+            if result and result["body"]["status"] == 0:
+                return result
+            else:
+                return None
+
+    def cwrite(self, member_ids, msg, extra=None, pushAlert=True, resp=True):
         """
         Create a chat room and send message to the chat room.
 
@@ -769,13 +775,15 @@ class kakaotalk:
         data["pushAlert"] = pushAlert
 
         self.s.sendall(self.create_loco_secure_packet("CWRITE", data))
-        result = self.translate_response(force_reply=True)
-        if result and result["body"]["status"] == 0:
-            return result
-        else:
-            return None
 
-    def leave(self, chat_id):
+        if resp:
+            result = self.translate_response(force_reply=True)
+            if result and result["body"]["status"] == 0:
+                return result
+            else:
+                return None
+
+    def leave(self, chat_id, resp=True):
         """
         Leave chat room.
 
@@ -797,11 +805,13 @@ class kakaotalk:
         data["chatId"] = chat_id
 
         self.s.sendall(self.create_loco_secure_packet("LEAVE", data))
-        result = self.translate_response(force_reply=True)
-        if result and result["body"]["status"] == 0:
-            return result
-        else:
-            return None
+
+        if resp:
+            result = self.translate_response(force_reply=True)
+            if result and result["body"]["status"] == 0:
+                return result
+            else:
+                return None
 
     def translate_response(self, s=None, force_reply=False):
         """
