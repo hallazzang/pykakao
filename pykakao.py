@@ -542,7 +542,7 @@ class kakaotalk:
         else:
             return None
 
-    def ping(self, resp=False):
+    def ping(self, resp=True):
         """
         Ping to Loco server.
 
