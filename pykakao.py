@@ -561,9 +561,9 @@ class kakaotalk:
             return None
 
         data = {}
+        self.s.sendall(self.create_loco_secure_packet("PING", data))
 
         if resp:
-            self.s.sendall(self.create_loco_secure_packet("PING", data))
             result = self.translate_response(force_reply=True)
             if result and result["body"]["status"] == 0:
                 return result
