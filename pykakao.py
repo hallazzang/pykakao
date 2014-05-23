@@ -110,9 +110,9 @@ class kakaotalk:
     KAKAO_ADD_FRIEND_URL = "https://fr-talk.kakao.com/wp/friends/add.json"
     KAKAO_UPLOAD_URL = "http://up-m.talk.kakao.com/upload"
 
-    KAKAO_USER_AGENT = "KT/1.1.8 Wd/6.3 ko"
-    KAKAO_AUTH_AGENT = "win32/1.1.8/ko"
-    KAKAO_AGENT = "win32/1.1.8/kr"
+    KAKAO_USER_AGENT = "KT/1.2.0 Wd/6.3 ko"
+    KAKAO_AUTH_AGENT = "win32/1.2.0/ko"
+    KAKAO_AGENT = "win32/1.2.0/kr"
     ANDROID_VERSION = "4.3.0"
 
     def __init__(self, session_key=None, device_uuid=None, user_id=None, **options):
