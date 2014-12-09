@@ -1,0 +1,180 @@
+Enter file contents here
+# coding: utf-8
+
+
+
+
+from pykakao import kakaotalk
+
+import time
+
+from time import sleep
+
+from bs4 import BeautifulSoup
+
+import urllib2
+
+
+
+
+def get_naver_rank():
+
+    response = urllib2.urlopen("http://www.naver.com")
+
+    soup = BeautifulSoup(response)
+
+
+
+
+    result = []
+
+
+
+
+    cnt = 1
+
+    for li in soup.find("ol", id="realrank").find_all("li"):
+
+        result.append("%d. %s" % (cnt, li.a["title"].encode("utf-8")))
+
+        cnt += 1
+
+        if cnt > 10:
+
+            break
+
+
+
+
+    return result
+
+
+
+
+def main():
+
+    blocked_list = []
+
+
+
+
+    kakao = kakaotalk(session_key="*****", device_uuid="*****", user_id=*****)
+
+    if kakao.login()["body"]["status"] == 0:
+
+        print "Login succeed."
+
+
+
+
+        while True:
+
+            try:
+
+                packet = kakao.translate_response()
+
+
+
+
+                if packet:
+
+                    command = packet["command"]
+
+                    body = packet["body"]
+
+
+
+
+                    now = time.strftime("%m/%d %H:%M:%S")
+
+
+
+
+                    if command == "MSG":
+
+                        message = body["chatLog"]["message"].encode("utf-8")
+
+                        chat_id = body["chatLog"]["chatId"]
+
+                        author_name = body["authorNickname"].encode("utf-8")
+
+                        author_id = body["chatLog"]["authorId"]
+
+
+
+
+                        print "[%s] (%d) %s > %s" % (now, chat_id, author_name, message)
+
+
+
+
+                        sleep(0.1)
+
+
+
+
+                        if message == "@차단" and author_id == kakao.user_id:
+
+                            if chat_id in blocked_list:
+
+                                kakao.write(chat_id, "[카톡봇] 이미 차단된 방입니다.")
+
+                            else:
+
+                                kakao.write(chat_id, "[카톡봇] 차단되었습니다.")
+
+                                blocked_list.append(chat_id)
+
+                        elif message == "@차단해제" and author_id == kakao.user_id:
+
+                            if chat_id in blocked_list:
+
+                                kakao.write(chat_id, "[카톡봇] 차단 해제되었습니다.")
+
+                                blocked_list.remove(chat_id)
+
+                            else:
+
+                                kakao.write(chat_id, "[카톡봇] 이미 차단 해제된 방입니다.")
+
+
+
+
+                        if not chat_id in blocked_list:
+
+                            if message == "@네이버실시간":
+
+                                kakao.write(chat_id, "[네이버 실시간 검색어]\n%s" % ("\n".join(get_naver_rank())))
+
+                    else: # unknown commands
+
+                        # print "[%s] <%s, %s>" % (now, command, body)
+
+                        pass
+
+                else:
+
+                    if kakao.login()["body"]["status"] != 0:
+
+                        print "Auto-reconnect failed."
+
+                        kakao.s.close()
+
+                        break
+
+            except KeyboardInterrupt:
+
+                kakao.s.close()
+
+                exit()
+
+    else:
+
+        print "Login failed."
+
+
+
+
+if __name__ == "__main__":
+
+    main()
