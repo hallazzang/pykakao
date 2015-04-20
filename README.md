@@ -1,14 +1,12 @@
 pykakao
 =======
+pykakao is a simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 
-pykakao is a very simple kakaotalk LOCO/HTTP API protocol wrapper for python.
-
-#### * Wait! If you gonna use 'Your' Kakaotalk ID(not an extra ID), using this library to run a bot or else is not recommended. (because of critical problem with PC Kakaotalk's login, and I don't know why it happens exactly.)
-#### 2014. 2. 26
-#### * Cannot use this library anymore. :( Kakao Team changed internal logic.
-#### * 더 이상 파이카카오 라이브러리를 사용하는게 불가능할 것 같습니다. :( 카카오팀이 내부적으로 로직을 바꿨습니다.
-
-###### If you really want to use pykakao, please send an email to hallazzang@gmail.com
+> Wait! If you gonna use YOUR Kakaotalk ID(not an extra ID), using this library to run a bot or else is not recommended(because of some reasons).
+> - 2014. 2. 26 / Cannot use this library anymore. :( Kakao Team changed internal logic.
+> - 2014. 2. 26 / 더 이상 파이카카오 라이브러리를 사용하는게 불가능할 것 같습니다. :( 카카오팀이 내부적으로 로직을 바꿨습니다.
+> - 2015. 4. 20 / 다만 적절한 수정을 거치면 다시 사용할 수 있습니다.
+> - If you really want to use pykakao, please send an email to hallazzang@gmail.com
 
 Installation
 ------------
@@ -26,7 +24,6 @@ Example Codes
 -------------
 
 1. How to get session key and user id
-
 ```python
 from pykakao import kakaotalk
 
@@ -40,7 +37,6 @@ else:
 ```
 
 2. A Simple echoing bot
-
 ```python
 from pykakao import kakaotalk
 
@@ -61,12 +57,10 @@ else:
 
 License
 -------
-
 pykakao is following MIT License.
 
 Thanks To
 ---------
-
 Cai([0x90 :: Cai's Blog](http://www.bpak.org/blog/))
 - [[KakaoTalk+] LOCO 프로토콜 분석 (1)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-1/)
 - [[KakaoTalk+] LOCO 프로토콜 분석 (2)](http://www.bpak.org/blog/2012/12/kakaotalk-loco-프로토콜-분석-2/)
