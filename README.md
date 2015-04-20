@@ -8,6 +8,8 @@ pykakao is a very simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 #### * Cannot use this library anymore. :( Kakao Team changed internal logic.
 #### * 더 이상 파이카카오 라이브러리를 사용하는게 불가능할 것 같습니다. :( 카카오팀이 내부적으로 로직을 바꿨습니다.
 
+###### If you really want to use pykakao, please send an email to hallazzang@gmail.com
+
 Installation
 ------------
 Install it using `setup.py`.
