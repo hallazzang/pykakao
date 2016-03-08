@@ -2,13 +2,7 @@ pykakao
 =======
 pykakao is a simple kakaotalk LOCO/HTTP API protocol wrapper for python.
 
-> Wait! If you gonna use YOUR Kakaotalk ID(not an extra ID), using this library to run a bot or else is not recommended(because of some reasons).
-> - 2014. 2. 26 / Cannot use this library anymore. :( Kakao Team changed internal logic.
-> - 2014. 2. 26 / 더 이상 파이카카오 라이브러리를 사용하는게 불가능할 것 같습니다. :( 카카오팀이 내부적으로 로직을 바꿨습니다.
-> - 2015. 4. 20 / 다만 적절한 수정을 거치면 다시 사용할 수 있습니다.
-> - If you really want to use pykakao, please send an email to hallazzang@gmail.com
-> - 2015. 4. 22 / ... 다시 막힌 것 같네요
-> - I think it's impossible again ...
+### ! warning: cannot get new `session_key` anymore.
 
 Installation
 ------------
